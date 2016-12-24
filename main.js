@@ -3,7 +3,8 @@
 var canvas;
 var context;
 var actors;
-var animId;
+var drawAnimId;
+var updateAnimId;
 
 function initialize()
 {
@@ -18,7 +19,16 @@ function initialize()
 	}
 	
 	// set up animation loop
-	animId = setInterval(redraw, 30);
+	drawAnimId = setInterval(redraw, 30);
+	updateAnimId = setInterval(update, 30);
+}
+
+function update()
+{
+	for (var i = 0; i < actors.length; ++i)
+	{
+		actors[i].update();
+	}
 }
 
 function redraw()
