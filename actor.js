@@ -7,6 +7,7 @@ var Actor = function(x, y)
 	this.size = 2 + Math.random() * 5;
 	this.speed = 0.5 + Math.random() * 1.3;
 	this.newRandomTarget();
+	this.hunger = 1000;
 };
 
 Actor.prototype.update = function()
@@ -24,13 +25,30 @@ Actor.prototype.update = function()
 		this.x += (this.targetx - this.x) * scale;
 		this.y += (this.targety - this.y) * scale;
 	}
+
+	for(var i = 0; i < foods.length; i++)
+	{
+		if (Math.abs(this.x - foods[i].x) < this.size && Math.abs(this.y - foods[i].y) < this.size)
+		{
+			var temp = foods[i];
+			foods[i] = foods[foods.length-1];
+			foods[foods.length-1] = temp;
+	//		document.append(foods.length);
+			this.size += temp.size/2;
+			foods.pop();
+			this.hunger = 1000;
+		}
+	}
+	this.hunger--;
+
 };
 
 Actor.prototype.draw = function(context)
 {
 	context.beginPath();
 	context.arc(this.x, this.y, this.size, 0, 2*Math.PI);
-	context.fillStyle = "#BB2200";
+	context.fillStyle = "#008000"
+	//context.fillStyle = "#BB2200";
 	context.fill();
 	context.lineWidth = 2;
 	context.strokeStyle = "#000000";
