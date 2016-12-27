@@ -52,7 +52,7 @@ World.prototype.update = function()
 		--this.cooldown;
 	}
 	
-	if (Math.random() < 0.01)
+	if (this.foods.length < 90 && Math.random() < 0.05)
 	{
 		this.foods.push(new Food(Math.random() * this.width, Math.random() * this.height));
 	}
