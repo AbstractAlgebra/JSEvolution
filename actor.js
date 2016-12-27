@@ -6,8 +6,9 @@ var Actor = function(world, x, y)
 	this.world = world;
 	this.x = x;
 	this.y = y;
-	this.size = 2 + Math.random() * 5;
+	this.size = 4 + Math.random() * 13;
 	this.speed = 0.5 + Math.random() * 2.3;
+	this.color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
 	this.newRandomTarget();
 };
 
@@ -27,14 +28,15 @@ Actor.prototype.update = function(world)
 		this.y += (this.targety - this.y) * scale;
 	}
 	
-	var collisions = this.world.collisions(this.x, this.y, this.size);
-	for (var i = 0; i < collisions.length; ++i)
+	if (this.world.canKill())
 	{
-		if (this.size > collisions[i].size && collisions[i].alive)
+		var collisions = this.world.collisions(this.x, this.y, this.size);
+		for (var i = 0; i < collisions.length; ++i)
 		{
-			collisions[i].alive = false;
-			//this.size += collisions[i].size;
-			//this.size += collisions[i].size;
+			if (this != collisions[i] && this.size <= collisions[i].size)
+			{
+				this.alive = false;
+			}
 		}
 	}
 };
@@ -43,7 +45,7 @@ Actor.prototype.draw = function(context)
 {
 	context.beginPath();
 	context.arc(this.x, this.y, this.size, 0, 2*Math.PI);
-	context.fillStyle = "#BB2200";
+	context.fillStyle = rgb(this.color[0], this.color[1], this.color[2]);
 	context.fill();
 	context.lineWidth = 2;
 	context.strokeStyle = "#000000";
@@ -54,7 +56,10 @@ Actor.prototype.reproduce = function(context)
 {
 	var child = new Actor(this.world, this.x, this.y);
 	child.speed = this.speed * variancem(0.3);
-	child.size = this.speed * variancem(0.3);
+	child.size = Math.min(23, this.size * variancem(0.3));
+	child.color[0] = this.color[0] * variancem(0.15);
+	child.color[1] = this.color[1] * variancem(0.15);
+	child.color[2] = this.color[2] * variancem(0.15);
 	return child;
 };
 

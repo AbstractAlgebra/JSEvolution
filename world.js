@@ -1,17 +1,18 @@
 "use strict";
 
-const targetpop = 23;
+const targetpop = 34;
 
 var World = function(width, height)
 {
 	this.width = width;
 	this.height = height;
 	this.actors = [];
-	for (var i = 0; i < 20; ++i)
+	for (var i = 0; i < targetpop; ++i)
 	{
 		this.actors.push(new Actor(this, Math.random() * width, Math.random() * height));
 	}
 	this.generation = 0;
+	this.cooldown = 32;
 };
 
 World.prototype.update = function()
@@ -26,7 +27,7 @@ World.prototype.update = function()
 	}
 	// if the pop is half the target pop, we treat this as the end of a
 	// a generation and all survivors will reproduce to start the next one
-	if (this.actors.length <= 10)//targetpop / 2)
+	if (this.actors.length <= targetpop / 2)
 	{
 		const oldlen = this.actors.length;
 		for (var i = 0; i < oldlen; ++i)
@@ -34,6 +35,12 @@ World.prototype.update = function()
 			this.actors.push(this.actors[i].reproduce());
 		}
 		++this.generation;
+		this.cooldown = 64;
+	}
+	
+	if (this.cooldown > 0)
+	{
+		--this.cooldown;
 	}
 };
 
@@ -42,13 +49,15 @@ World.prototype.draw = function(context)
 	context.fillStyle = "#44BB44";
 	context.fillRect(0, 0, canvas.width, canvas.height);
 	
-	context.fillStyle = "#000000";
-	context.fillText("Generation: " + this.generation, 16, 16);
-	
 	for (var i = 0; i < this.actors.length; ++i)
 	{
 		this.actors[i].draw(context);
 	}
+	
+	context.fillStyle = "#000000";
+	context.fillText("Generation: " + this.generation, 16, 16);
+	context.fillText("Population: " + this.actors.length + " / " + targetpop, 16, 32);
+	context.fillText("cooldown: " + this.cooldown, 16, 48);
 };
 
 World.prototype.collisions = function(x, y, radius)
@@ -64,6 +73,11 @@ World.prototype.collisions = function(x, y, radius)
 		}
 	}
 	return out;
+};
+
+World.prototype.canKill = function()
+{
+	return this.cooldown == 0;
 };
 
 World.prototype

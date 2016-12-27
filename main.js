@@ -13,8 +13,8 @@ function initialize()
 	world = new World(canvas.width, canvas.height);
 	
 	// set up animation loop
-	drawAnimId = setInterval(redraw, 30);
-	updateAnimId = setInterval(update, 3);
+	drawAnimId = setInterval(redraw, 32);
+	updateAnimId = setInterval(update, 16);
 }
 
 function update()

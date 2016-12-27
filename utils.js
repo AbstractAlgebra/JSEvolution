@@ -16,3 +16,17 @@ function variancem(difference)
 {
 	return variancea(1, difference);
 }
+
+function clamp(x, min, max)
+{
+	return Math.max(min, Math.min(x, max));
+}
+
+function rgb(r, g, b)
+{
+	function adjust(x)
+	{
+		return clamp(Math.floor(x), 0, 255);
+	}
+	return "rgb(" + adjust(r) + "," + adjust(g) + "," + adjust(b) + ")";
+}
