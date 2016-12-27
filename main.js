@@ -9,7 +9,7 @@ function initialize()
 {
 	const canvas = document.getElementById("canvas");
 	context = canvas.getContext("2d");
-	
+
 	world = new World(canvas.width, canvas.height);
 	
 	// set up animation loop

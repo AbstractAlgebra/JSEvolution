@@ -10,6 +10,7 @@ var Actor = function(world, x, y)
 	this.speed = 0.5 + Math.random() * 2.3;
 	this.color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
 	this.newRandomTarget();
+	this.hunger = 1000;
 };
 
 Actor.prototype.update = function(world)
@@ -30,7 +31,7 @@ Actor.prototype.update = function(world)
 	
 	if (this.world.canKill())
 	{
-		var collisions = this.world.collisions(this.x, this.y, this.size);
+		var collisions = this.world.collisions(this.x, this.y, this.size, "actor");
 		for (var i = 0; i < collisions.length; ++i)
 		{
 			if (this != collisions[i] && this.size <= collisions[i].size)
@@ -39,6 +40,14 @@ Actor.prototype.update = function(world)
 			}
 		}
 	}
+
+	var foodNear = this.world.collisions(this.x, this.y, this.size, "food");
+	if (foodNear.length > 0)
+	{
+		foodNear[0].eaten = true;
+		this.hunger = 1000;
+	}
+	this.hunger--;
 };
 
 Actor.prototype.draw = function(context)
@@ -60,6 +69,7 @@ Actor.prototype.reproduce = function(context)
 	child.color[0] = this.color[0] * variancem(0.15);
 	child.color[1] = this.color[1] * variancem(0.15);
 	child.color[2] = this.color[2] * variancem(0.15);
+	this.hunger = 1000;
 	return child;
 };
 

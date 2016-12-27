@@ -7,6 +7,7 @@ var World = function(width, height)
 	this.width = width;
 	this.height = height;
 	this.actors = [];
+	this.foods = [];
 	for (var i = 0; i < targetpop; ++i)
 	{
 		this.actors.push(new Actor(this, Math.random() * width, Math.random() * height));
@@ -25,6 +26,14 @@ World.prototype.update = function()
 			this.actors[i] = this.actors.pop();
 		}
 	}
+	for (var i = 0; i < this.foods.length; ++i)
+	{
+		this.foods[i].update();
+		if (this.foods[i].eaten)
+		{
+			this.foods[i] = this.foods.pop();
+		}
+	}
 	// if the pop is half the target pop, we treat this as the end of a
 	// a generation and all survivors will reproduce to start the next one
 	if (this.actors.length <= targetpop / 2)
@@ -35,12 +44,17 @@ World.prototype.update = function()
 			this.actors.push(this.actors[i].reproduce());
 		}
 		++this.generation;
-		this.cooldown = 64;
+		this.cooldown = 128;
 	}
 	
 	if (this.cooldown > 0)
 	{
 		--this.cooldown;
+	}
+	
+	if (Math.random() < 0.01)
+	{
+		this.foods.push(new Food(Math.random() * this.width, Math.random() * this.height));
 	}
 };
 
@@ -54,25 +68,30 @@ World.prototype.draw = function(context)
 		this.actors[i].draw(context);
 	}
 	
+	for (var i = 0; i < this.foods.length; ++i)
+	{
+		this.foods[i].draw(context);
+	}
+	
 	context.fillStyle = "#000000";
 	context.fillText("Generation: " + this.generation, 16, 16);
 	context.fillText("Population: " + this.actors.length + " / " + targetpop, 16, 32);
 	context.fillText("cooldown: " + this.cooldown, 16, 48);
 };
 
-World.prototype.collisions = function(x, y, radius)
+World.prototype.collisions = function(x, y, radius, type)
 {
-	var out = [];
-	for (var i = 0; i < this.actors.length; ++i)
+	switch (type)
 	{
-		const actor = this.actors[i];
-		// TOOD: replace with non-sqrt dist calculation?
-		if (dist(x, y, actor.x, actor.y) <= radius + actor.size)
-		{
-			out.push(actor);
-		}
+		case "actor":
+			return collisionImpl(x, y, radius, this.actors);
+		case "food":
+			return collisionImpl(x, y, radius, this.foods);
+		default:
+			alert("invald collision type: " + type)
+			break;
 	}
-	return out;
+	return [];
 };
 
 World.prototype.canKill = function()
@@ -80,4 +99,17 @@ World.prototype.canKill = function()
 	return this.cooldown == 0;
 };
 
-World.prototype
+function collisionImpl(x, y, radius, list)
+{
+	var out = [];
+	for (var i = 0; i < list.length; ++i)
+	{
+		const obj = list[i];
+		// TOOD: replace with non-sqrt dist calculation?
+		if (dist(x, y, obj.x, obj.y) <= radius + obj.size)
+		{
+			out.push(obj);
+		}
+	}
+	return out;
+}
