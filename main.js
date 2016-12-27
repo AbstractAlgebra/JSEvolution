@@ -4,7 +4,9 @@ var context;
 var world;
 var drawAnimId;
 var updateAnimId;
+var updateStep = 16;
 
+// html interface
 function initialize()
 {
 	const canvas = document.getElementById("canvas");
@@ -14,9 +16,23 @@ function initialize()
 	
 	// set up animation loop
 	drawAnimId = setInterval(redraw, 32);
-	updateAnimId = setInterval(update, 16);
+	updateAnimId = setInterval(update, updateStep);
 }
 
+function increaseStep()
+{
+	setUpdateStep(updateStep * 2);
+}
+
+function decreaseStep()
+{
+	if (updateStep > 1)
+	{
+		setUpdateStep(updateStep / 2);
+	}
+}
+
+// non-interface
 function update()
 {
 	world.update();
@@ -25,4 +41,11 @@ function update()
 function redraw()
 {
 	world.draw(context);
+}
+
+function setUpdateStep(newStep)
+{
+	updateStep = newStep;
+	clearInterval(updateAnimId);
+	updateAnimId = setInterval(update, updateStep);
 }
