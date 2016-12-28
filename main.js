@@ -4,7 +4,7 @@ var context;
 var world;
 var drawAnimId;
 var updateAnimId;
-var updateStep = 16;
+var updateStep = 32;
 
 // html interface
 function initialize()
@@ -35,7 +35,10 @@ function decreaseStep()
 // non-interface
 function update()
 {
-	world.update();
+	for (var i = 0; i < 32; ++i)
+	{
+		world.update();
+	}
 }
 
 function redraw()

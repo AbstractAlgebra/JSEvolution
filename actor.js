@@ -1,6 +1,7 @@
 "use strict";
 
-const maxHunger = 1000;
+const MAX_HUNGER = 1000;
+const NO_FAMILY = -1;
 
 var Actor = function(world, x, y)
 {
@@ -8,11 +9,12 @@ var Actor = function(world, x, y)
 	this.world = world;
 	this.x = x;
 	this.y = y;
-	this.size = 4 + Math.random() * 23;
+	this.size = 4 + Math.random() * 256;
 	this.speed = 0.5 + Math.random() * 2.3;
 	this.color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
 	this.newRandomTarget();
-	this.hunger = maxHunger;
+	this.hunger = MAX_HUNGER;
+	this.family = NO_FAMILY;
 };
 
 Actor.prototype.update = function(world)
@@ -30,17 +32,17 @@ Actor.prototype.update = function(world)
 		this.x += (this.targetx - this.x) * scale;
 		this.y += (this.targety - this.y) * scale;
 	}
-	
-	if (this.world.canKill())
+
+	var collisions = this.world.collisions(this.x, this.y, this.size, "actor");
+	for (var i = 0; i < collisions.length; ++i)
 	{
-		var collisions = this.world.collisions(this.x, this.y, this.size, "actor");
-		for (var i = 0; i < collisions.length; ++i)
+		const related = this.family != NO_FAMILY && this.family == collisions[i].family;
+		if ((this.world.canKill() || !related) &&
+			this != collisions[i] &&
+			this.size <= collisions[i].size)
 		{
-			if (this != collisions[i] && this.size <= collisions[i].size)
-			{
-				this.alive = false;
-				collisions[i].hunger = maxHunger;
-			}
+			this.alive = false;
+			collisions[i].hunger = MAX_HUNGER;
 		}
 	}
 
@@ -48,9 +50,9 @@ Actor.prototype.update = function(world)
 	if (foodNear.length > 0)
 	{
 		foodNear[0].eaten = true;
-		this.hunger = maxHunger;
+		this.hunger = MAX_HUNGER;
 	}
-	this.hunger -= this.size / 16;
+	this.hunger -= 0.3 + this.size / 32;
 	if (this.hunger <= 0)
 	{
 		this.alive = false;
@@ -64,7 +66,7 @@ Actor.prototype.draw = function(context)
 	context.fillStyle = rgb(this.color[0], this.color[1], this.color[2]);
 	context.fill();
 	context.beginPath();
-	context.arc(this.x, this.y, this.size, 0, 2*Math.PI * this.hunger / maxHunger);
+	context.arc(this.x, this.y, this.size, 0, 2*Math.PI * this.hunger / MAX_HUNGER);
 	context.lineWidth = 2;
 	context.strokeStyle = "#000000";
 	context.stroke();

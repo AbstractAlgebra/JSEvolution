@@ -1,6 +1,6 @@
 "use strict";
 
-const targetpop = 34;
+const targetpop = 134;
 
 var World = function(width, height)
 {
@@ -13,7 +13,7 @@ var World = function(width, height)
 		this.actors.push(new Actor(this, Math.random() * width, Math.random() * height));
 	}
 	this.generation = 0;
-	this.cooldown = 32;
+	this.cooldown = 0;
 };
 
 World.prototype.update = function()
@@ -41,10 +41,16 @@ World.prototype.update = function()
 		const oldlen = this.actors.length;
 		for (var i = 0; i < oldlen; ++i)
 		{
-			this.actors.push(this.actors[i].reproduce());
+			var parent = this.actors[i];
+			var child = parent.reproduce();
+			// mark them as being in the same family so they don't eat each
+			// other until after the cooldown
+			parent.family = i;
+			child.family = i;
+			this.actors.push(child);
 		}
 		++this.generation;
-		this.cooldown = 128;
+		this.cooldown = 1024;
 	}
 	
 	if (this.cooldown > 0)
@@ -52,9 +58,9 @@ World.prototype.update = function()
 		--this.cooldown;
 	}
 	
-	if (this.foods.length < 90 && Math.random() < 0.05)
+	if (this.foods.length < 420 && Math.random() < 0.05)
 	{
-		this.foods.push(new Food(Math.random() * this.width, Math.random() * this.height));
+		this.foods.push(new Food((0.05 + 0.9 * Math.random()) * this.width, (0.05 + 0.9 * Math.random()) * this.height));
 	}
 };
 
