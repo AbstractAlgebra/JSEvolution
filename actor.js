@@ -9,7 +9,7 @@ var Actor = function(world, x, y)
 	this.world = world;
 	this.x = x;
 	this.y = y;
-	this.size = 4 + Math.random() * 256;
+	this.size = 4 + Math.random() * 32;
 	this.speed = 0.5 + Math.random() * 2.3;
 	this.color = [Math.random() * 255, Math.random() * 255, Math.random() * 255];
 	this.newRandomTarget();
@@ -52,7 +52,7 @@ Actor.prototype.update = function(world)
 		foodNear[0].eaten = true;
 		this.hunger = MAX_HUNGER;
 	}
-	this.hunger -= 0.3 + this.size / 32;
+	this.hunger -= 0.3 + this.size / 128 + this.speed / 256;
 	if (this.hunger <= 0)
 	{
 		this.alive = false;
@@ -75,8 +75,8 @@ Actor.prototype.draw = function(context)
 Actor.prototype.reproduce = function(context)
 {
 	var child = new Actor(this.world, this.x, this.y);
-	child.speed = this.speed * variancem(0.3);
-	child.size = Math.min(23, this.size * variancem(0.3));
+	child.speed = clamp(this.speed * variancem(0.3), 0.5, 32);
+	child.size = clamp(this.size * variancem(0.3), 4, 256);
 	child.color[0] = this.color[0] * variancem(0.15);
 	child.color[1] = this.color[1] * variancem(0.15);
 	child.color[2] = this.color[2] * variancem(0.15);

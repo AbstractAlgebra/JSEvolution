@@ -35,7 +35,7 @@ function decreaseStep()
 // non-interface
 function update()
 {
-	for (var i = 0; i < 32; ++i)
+	for (var i = 0; i < 16; ++i)
 	{
 		world.update();
 	}
