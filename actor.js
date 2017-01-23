@@ -15,23 +15,12 @@ var Actor = function(world, x, y)
 	this.newRandomTarget();
 	this.hunger = MAX_HUNGER;
 	this.family = NO_FAMILY;
+	this.btree = new Walk();
 };
 
 Actor.prototype.update = function(world)
 {
-	const distToTarget = dist(this.x, this.y, this.targetx, this.targety);
-	if (distToTarget < this.speed)
-	{
-		this.newRandomTarget();
-	}
-	else
-	{
-		// ugh.... pls make less ugly by either writing a dir(x1, y1, x2, y2)
-		// or making this all in terms of vectors and writing normalize() and len() for those
-		const scale = this.speed / distToTarget;
-		this.x += (this.targetx - this.x) * scale;
-		this.y += (this.targety - this.y) * scale;
-	}
+	this.btree.run(this, this.world);
 
 	var collisions = this.world.collisions(this.x, this.y, this.size, "actor");
 	for (var i = 0; i < collisions.length; ++i)
